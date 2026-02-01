@@ -1,34 +1,41 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta charset="UTF-8">
     <title>AR Küp Projesi</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <style>
-      /* Sağ üstteki Versiyon Butonu */
       #version-btn {
         position: absolute;
         top: 20px;
         right: 20px;
         z-index: 1000;
-        padding: 10px;
-        background: rgba(0, 0, 0, 0.7);
+        padding: 12px 18px;
+        background: rgba(0, 123, 255, 0.85); /* Şık bir mavi tonu */
         color: white;
-        border: 1px solid white;
-        border-radius: 5px;
-        font-family: sans-serif;
+        border: 2px solid #ffffff;
+        border-radius: 8px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0px 4px 10px rgba(0,0,0,0.3);
       }
     </style>
   </head>
   <body style="margin: 0; overflow: hidden;">
     
-    <button id="version-btn" onclick="alert('Güncel Versiyon: v1.0.2\nSon Güncelleme: 1 Şubat 2026')">
-      Versiyon: v1.0.2
+    <button id="version-btn" onclick="alert('Versiyon: 1.0.3\nSon Güncelleme: 1 Şubat 2026\nDurum: Özel Marker Aktif')">
+      V 1.0.3
     </button>
 
-    <a-scene embedded arjs>
-      <a-marker preset="hiro">
-        <a-box position="0 0.5 0" material="color: cyan; opacity: 0.8;" animation="property: rotation; to: 0 360 0; loop: true; dur: 5000"></a-box>
+    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
+      
+      <a-marker type="pattern" url="QR/desen-ar_projesi.patt">
+        <a-box position="0 0.5 0" 
+               material="color: #4CC3D9; opacity: 0.9;" 
+               animation="property: rotation; to: 0 360 0; loop: true; dur: 4000">
+        </a-box>
       </a-marker>
       
       <a-entity camera></a-entity>
