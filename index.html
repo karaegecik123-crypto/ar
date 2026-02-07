@@ -3,88 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <title>AR QR Projesi - V8 GERÇEK 3D</title>
+    <title>AR QR Projesi - Sabit Obje</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     
-    <script>
-        AFRAME.registerComponent('marker-kontrol', {
-            init: function () {
-                this.markerSirasinda = false;
-                this.kalanSure = 15;
-                this.kup = document.querySelector("#ar-kup");
-                this.bilgiEkrani = document.querySelector("#status-note");
-
-                this.el.addEventListener('markerFound', () => {
-                    if (!this.markerSirasinda) {
-                        // 1. POZİSYON VE ROTASYON HESAPLA
-                        // Marker'ın dünyadaki yerini alıyoruz
-                        var pos = new THREE.Vector3();
-                        var quat = new THREE.Quaternion();
-                        var scale = new THREE.Vector3();
-                        
-                        this.el.object3D.matrixWorld.decompose(pos, quat, scale);
-
-                        // 2. KÜPÜ O NOKTAYA IŞINLA
-                        this.kup.object3D.position.copy(pos);
-                        this.kup.object3D.quaternion.copy(quat);
-                        this.kup.setAttribute('visible', 'true');
-                        
-                        // 3. 15 SANİYELİK KİLİT MEKANİZMASI
-                        this.markerSirasinda = true;
-                        this.kalanSure = 15;
-                        
-                        const sayacInterval = setInterval(() => {
-                            this.kalanSure--;
-                            this.bilgiEkrani.innerText = "SÜRE: " + this.kalanSure + "s (3D SABİT)";
-                            this.bilgiEkrani.style.background = "#e67e22";
-
-                            if (this.kalanSure <= 0) {
-                                clearInterval(sayacInterval);
-                                this.kup.setAttribute('visible', 'false');
-                                this.markerSirasinda = false;
-                                this.bilgiEkrani.innerText = "DURUM: HAZIR";
-                                this.bilgiEkrani.style.background = "#27ae60";
-                            }
-                        }, 1000);
-                    }
-                });
-            }
-        });
-    </script>
-
     <style>
         #version-info {
-            position: absolute; top: 10px; right: 10px; z-index: 1001;
-            padding: 10px; background: rgba(0,0,0,0.9);
-            color: #fff; border-radius: 8px; font-family: monospace; font-size: 12px;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1001;
+            padding: 8px 12px;
+            background: rgba(44, 62, 80, 0.9);
+            color: #ecf0f1;
+            border: 1px solid #34495e;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            pointer-events: none;
         }
-        #status-note { margin-top: 5px; padding: 5px; display: block; text-align: center; font-weight: bold; border-radius: 4px; }
     </style>
 </head>
 
 <body style="margin: 0; overflow: hidden;">
 
     <div id="version-info">
-        VER: 2026.02.07-v8 (Real 3D)<br>
-        <span id="status-note" style="background: #27ae60;">DURUM: HAZIR</span>
+        VER: 2026.02.07-v2<br>
+        STATUS: STATIC_OBJECT
     </div>
 
     <a-scene 
         embedded 
-        arjs="sourceType: webcam; debugUIEnabled: false; trackingMethod: best;"
+        arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3; trackingMethod: best;"
         vr-mode-ui="enabled: false">
         
-        <a-marker type="pattern" url="qr/pattern-ar_projesi.patt" marker-kontrol></a-marker>
+        <a-marker 
+            type="pattern" 
+            url="qr/pattern-ar_projesi.patt"
+            smooth="true"
+            smoothCount="10"
+            smoothTolerance="0.01"
+            smoothThreshold="5">
 
-        <a-entity id="ar-kup" visible="false">
             <a-box 
                 position="0 0.5 0" 
-                scale="0.5 0.5 0.5"
-                material="color: #FF5733; opacity: 0.9; metalness: 0.5; roughness: 0.2;">
-                <a-text value="GERCEK 3D" align="center" position="0 0.7 0" width="3" color="white"></a-text>
+                scale="1 1 1"
+                material="color: #FF5733; transparent: true; opacity: 0.9; side: double;">
             </a-box>
-        </a-entity>
+            
+            <a-text 
+                value="Sanal Kup" 
+                position="0 1.2 0" 
+                align="center"
+                color="white" 
+                width="4">
+            </a-text>
+
+        </a-marker>
 
         <a-entity camera></a-entity>
     </a-scene>
