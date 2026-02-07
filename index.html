@@ -3,36 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <title>AR QR Projesi - Gecikmeli Yükleme</title>
+    <title>AR QR Projesi - 15sn Kilit</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     
     <script>
-        // Yeni bir mantık oluşturuyoruz: 'marker-kontrol'
         AFRAME.registerComponent('marker-kontrol', {
             init: function () {
-                this.markerSirasinda = false; // 5 saniyelik bekleme durumu
+                this.markerSirasinda = false;
                 this.kup = document.querySelector("#ar-kup");
                 this.metin = document.querySelector("#ar-metin");
                 this.bilgiEkrani = document.querySelector("#status-note");
 
                 this.el.addEventListener('markerFound', () => {
                     if (!this.markerSirasinda) {
-                        // Küpü göster
+                        // Küpü ve metni görünür yap
                         this.kup.setAttribute('visible', 'true');
                         this.metin.setAttribute('visible', 'true');
                         
-                        // Kilidi aktif et (5 saniye boyunca tekrar okunmasın)
+                        // 15 saniyelik kilidi başlat
                         this.markerSirasinda = true;
-                        this.bilgiEkrani.innerText = "DURUM: KİLİTLİ (5sn)";
-                        this.bilgiEkrani.style.background = "rgba(192, 57, 43, 0.9)";
+                        this.bilgiEkrani.innerText = "DURUM: KİLİTLİ (15sn)";
+                        this.bilgiEkrani.style.background = "#e74c3c"; // Kırmızı tonu
 
-                        // 5 saniye sonra kilidi aç
+                        // Tam 15.000 milisaniye sonra kilidi aç
                         setTimeout(() => {
                             this.markerSirasinda = false;
                             this.bilgiEkrani.innerText = "DURUM: HAZIR";
-                            this.bilgiEkrani.style.background = "rgba(39, 174, 96, 0.9)";
-                        }, 5000);
+                            this.bilgiEkrani.style.background = "#27ae60"; // Yeşil tonu
+                        }, 15000); 
                     }
                 });
             }
@@ -45,19 +44,22 @@
             top: 10px;
             right: 10px;
             z-index: 1001;
-            padding: 8px 12px;
-            background: rgba(44, 62, 80, 0.9);
+            padding: 10px;
+            background: rgba(44, 62, 80, 0.95);
             color: #ecf0f1;
-            border: 1px solid #34495e;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 12px;
+            border-radius: 5px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
         #status-note {
-            margin-top: 5px;
-            background: rgba(39, 174, 96, 0.9);
-            padding: 2px 5px;
+            margin-top: 8px;
+            padding: 4px 8px;
             display: block;
+            text-align: center;
+            font-weight: bold;
+            border-radius: 3px;
+            transition: background 0.3s ease;
         }
     </style>
 </head>
@@ -65,8 +67,8 @@
 <body style="margin: 0; overflow: hidden;">
 
     <div id="version-info">
-        VER: 2026.02.07-v3<br>
-        <span id="status-note">DURUM: HAZIR</span>
+        VER: 2026.02.07-v4<br>
+        <span id="status-note" style="background: #27ae60;">DURUM: HAZIR</span>
     </div>
 
     <a-scene 
