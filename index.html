@@ -3,10 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <title>AR QR Projesi - Sabit Obje</title>
+    <title>AR QR Projesi - Gecikmeli Yükleme</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     
+    <script>
+        // Yeni bir mantık oluşturuyoruz: 'marker-kontrol'
+        AFRAME.registerComponent('marker-kontrol', {
+            init: function () {
+                this.markerSirasinda = false; // 5 saniyelik bekleme durumu
+                this.kup = document.querySelector("#ar-kup");
+                this.metin = document.querySelector("#ar-metin");
+                this.bilgiEkrani = document.querySelector("#status-note");
+
+                this.el.addEventListener('markerFound', () => {
+                    if (!this.markerSirasinda) {
+                        // Küpü göster
+                        this.kup.setAttribute('visible', 'true');
+                        this.metin.setAttribute('visible', 'true');
+                        
+                        // Kilidi aktif et (5 saniye boyunca tekrar okunmasın)
+                        this.markerSirasinda = true;
+                        this.bilgiEkrani.innerText = "DURUM: KİLİTLİ (5sn)";
+                        this.bilgiEkrani.style.background = "rgba(192, 57, 43, 0.9)";
+
+                        // 5 saniye sonra kilidi aç
+                        setTimeout(() => {
+                            this.markerSirasinda = false;
+                            this.bilgiEkrani.innerText = "DURUM: HAZIR";
+                            this.bilgiEkrani.style.background = "rgba(39, 174, 96, 0.9)";
+                        }, 5000);
+                    }
+                });
+            }
+        });
+    </script>
+
     <style>
         #version-info {
             position: absolute;
@@ -20,7 +52,12 @@
             border-radius: 4px;
             font-family: monospace;
             font-size: 12px;
-            pointer-events: none;
+        }
+        #status-note {
+            margin-top: 5px;
+            background: rgba(39, 174, 96, 0.9);
+            padding: 2px 5px;
+            display: block;
         }
     </style>
 </head>
@@ -28,33 +65,30 @@
 <body style="margin: 0; overflow: hidden;">
 
     <div id="version-info">
-        VER: 2026.02.07-v2<br>
-        STATUS: STATIC_OBJECT
+        VER: 2026.02.07-v3<br>
+        <span id="status-note">DURUM: HAZIR</span>
     </div>
 
     <a-scene 
         embedded 
-        arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3; trackingMethod: best;"
+        arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
         vr-mode-ui="enabled: false">
         
-        <a-marker 
-            type="pattern" 
-            url="qr/pattern-ar_projesi.patt"
-            smooth="true"
-            smoothCount="10"
-            smoothTolerance="0.01"
-            smoothThreshold="5">
-
+        <a-marker type="pattern" url="qr/pattern-ar_projesi.patt" marker-kontrol>
+            
             <a-box 
+                id="ar-kup"
                 position="0 0.5 0" 
-                scale="1 1 1"
-                material="color: #FF5733; transparent: true; opacity: 0.9; side: double;">
+                visible="false"
+                material="color: #FF5733; transparent: true; opacity: 0.9;">
             </a-box>
             
             <a-text 
+                id="ar-metin"
                 value="Sanal Kup" 
                 position="0 1.2 0" 
                 align="center"
+                visible="false"
                 color="white" 
                 width="4">
             </a-text>
