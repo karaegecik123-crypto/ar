@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <title>AR QR Projesi - V6 Çivileme</title>
+    <title>AR QR Projesi - V7 Gerçek 3D Çivileme</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     
@@ -12,39 +12,36 @@
             init: function () {
                 this.markerSirasinda = false;
                 this.kalanSure = 15;
-                // HTML öğelerini seçiyoruz
                 this.kup = document.querySelector("#ar-kup");
                 this.bilgiEkrani = document.querySelector("#status-note");
 
                 this.el.addEventListener('markerFound', () => {
                     if (!this.markerSirasinda) {
-                        // 1. QR GÖRÜLDÜĞÜ AN KÜPÜ ORAYA ÇİVİLE
-                        // Marker'ın o anki dünya konumunu ve rotasyonunu alıp küpe kopyalıyoruz
-                        var worldPos = new THREE.Vector3();
-                        this.el.object3D.getWorldPosition(worldPos);
-                        
-                        var worldRot = new THREE.Quaternion();
-                        this.el.object3D.getWorldQuaternion(worldRot);
-
-                        this.kup.object3D.position.copy(worldPos);
-                        this.kup.object3D.quaternion.copy(worldRot);
-                        
-                        // Küpü görünür yap (Artık marker gitse de o burada kalacak)
-                        this.kup.setAttribute('visible', 'true');
-                        
-                        // 2. KİLİT VE GERİ SAYIM BAŞLAT
                         this.markerSirasinda = true;
                         this.kalanSure = 15;
+
+                        // Küpü marker'ın konumuna anlık olarak eşitle
+                        this.kup.setAttribute('visible', 'true');
                         
+                        // ÖNEMLİ: Küpü marker'ın o anki pozisyonuna 'sabitle'
+                        // matrixWorld kullanarak dünya koordinatlarını alıyoruz
+                        var worldMatrix = this.el.object3D.matrixWorld;
+                        this.kup.object3D.applyMatrix4(worldMatrix);
+
                         const sayacInterval = setInterval(() => {
                             this.kalanSure--;
-                            this.bilgiEkrani.innerText = "SÜRE: " + this.kalanSure + "s (ÇİVİLENDİ)";
-                            this.bilgiEkrani.style.background = "#e67e22"; // Turuncu (Aktif)
+                            this.bilgiEkrani.innerText = "SÜRE: " + this.kalanSure + "s (SABİT)";
+                            this.bilgiEkrani.style.background = "#e67e22";
 
                             if (this.kalanSure <= 0) {
                                 clearInterval(sayacInterval);
-                                // 3. SÜRE BİTTİĞİNDE SİL VE SIFIRLA
+                                // 15 sn bittiğinde her şeyi sıfırla
                                 this.kup.setAttribute('visible', 'false');
+                                // Pozisyonu sıfırla ki bir sonraki okumada kaymasın
+                                this.kup.object3D.position.set(0, 0, 0);
+                                this.kup.object3D.quaternion.set(0, 0, 0, 1);
+                                this.kup.object3D.scale.set(1, 1, 1);
+                                
                                 this.markerSirasinda = false;
                                 this.bilgiEkrani.innerText = "DURUM: HAZIR";
                                 this.bilgiEkrani.style.background = "#27ae60";
@@ -58,42 +55,36 @@
 
     <style>
         #version-info {
-            position: absolute;
-            top: 10px; right: 10px; z-index: 1001;
+            position: absolute; top: 10px; right: 10px; z-index: 1001;
             padding: 10px; background: rgba(0,0,0,0.8);
-            color: #fff; border-radius: 8px;
-            font-family: sans-serif; font-size: 12px;
+            color: #fff; border-radius: 8px; font-family: sans-serif; font-size: 12px;
         }
-        #status-note {
-            margin-top: 5px; padding: 5px;
-            display: block; text-align: center; font-weight: bold;
-        }
+        #status-note { margin-top: 5px; padding: 5px; display: block; text-align: center; font-weight: bold; }
     </style>
 </head>
 
 <body style="margin: 0; overflow: hidden;">
 
     <div id="version-info">
-        VER: 2026.02.07-v6 (Pin System)<br>
+        VER: 2026.02.07-v7 (True 3D Pin)<br>
         <span id="status-note" style="background: #27ae60;">DURUM: HAZIR</span>
     </div>
 
     <a-scene 
         embedded 
-        arjs="sourceType: webcam; debugUIEnabled: false;"
+        arjs="sourceType: webcam; debugUIEnabled: false; trackingMethod: best;"
         vr-mode-ui="enabled: false">
         
         <a-marker type="pattern" url="qr/pattern-ar_projesi.patt" marker-kontrol>
             </a-marker>
 
-        <a-box 
-            id="ar-kup"
-            position="0 0 -5" 
-            visible="false"
-            scale="1 1 1"
-            material="color: #FF5733; opacity: 0.9;">
-            <a-text value="Sanal Kup" align="center" position="0 0.8 0" width="3"></a-text>
-        </a-box>
+        <a-entity id="ar-kup" visible="false">
+            <a-box 
+                position="0 0.5 0" 
+                material="color: #FF5733; opacity: 0.8; side: double;">
+                <a-text value="3D SABIT OBJE" align="center" position="0 0.8 0" width="3"></a-text>
+            </a-box>
+        </a-entity>
 
         <a-entity camera></a-entity>
     </a-scene>
