@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <title>AR QR Projesi - V5 Geri Sayım</title>
+    <title>AR QR Projesi - V6 Çivileme</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     
@@ -12,28 +12,39 @@
             init: function () {
                 this.markerSirasinda = false;
                 this.kalanSure = 15;
+                // HTML öğelerini seçiyoruz
                 this.kup = document.querySelector("#ar-kup");
-                this.metin = document.querySelector("#ar-metin");
                 this.bilgiEkrani = document.querySelector("#status-note");
 
                 this.el.addEventListener('markerFound', () => {
                     if (!this.markerSirasinda) {
-                        // Objeleri göster
-                        this.kup.setAttribute('visible', 'true');
-                        this.metin.setAttribute('visible', 'true');
+                        // 1. QR GÖRÜLDÜĞÜ AN KÜPÜ ORAYA ÇİVİLE
+                        // Marker'ın o anki dünya konumunu ve rotasyonunu alıp küpe kopyalıyoruz
+                        var worldPos = new THREE.Vector3();
+                        this.el.object3D.getWorldPosition(worldPos);
                         
-                        // Kilidi başlat
+                        var worldRot = new THREE.Quaternion();
+                        this.el.object3D.getWorldQuaternion(worldRot);
+
+                        this.kup.object3D.position.copy(worldPos);
+                        this.kup.object3D.quaternion.copy(worldRot);
+                        
+                        // Küpü görünür yap (Artık marker gitse de o burada kalacak)
+                        this.kup.setAttribute('visible', 'true');
+                        
+                        // 2. KİLİT VE GERİ SAYIM BAŞLAT
                         this.markerSirasinda = true;
                         this.kalanSure = 15;
                         
-                        // Geri sayım sayacı
                         const sayacInterval = setInterval(() => {
                             this.kalanSure--;
-                            this.bilgiEkrani.innerText = "BEKLEYİN: " + this.kalanSure + "s";
-                            this.bilgiEkrani.style.background = "#e74c3c";
+                            this.bilgiEkrani.innerText = "SÜRE: " + this.kalanSure + "s (ÇİVİLENDİ)";
+                            this.bilgiEkrani.style.background = "#e67e22"; // Turuncu (Aktif)
 
                             if (this.kalanSure <= 0) {
                                 clearInterval(sayacInterval);
+                                // 3. SÜRE BİTTİĞİNDE SİL VE SIFIRLA
+                                this.kup.setAttribute('visible', 'false');
                                 this.markerSirasinda = false;
                                 this.bilgiEkrani.innerText = "DURUM: HAZIR";
                                 this.bilgiEkrani.style.background = "#27ae60";
@@ -48,24 +59,14 @@
     <style>
         #version-info {
             position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 1001;
-            padding: 10px;
-            background: rgba(44, 62, 80, 0.95);
-            color: #ecf0f1;
-            border-radius: 5px;
-            font-family: sans-serif;
-            font-size: 13px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            top: 10px; right: 10px; z-index: 1001;
+            padding: 10px; background: rgba(0,0,0,0.8);
+            color: #fff; border-radius: 8px;
+            font-family: sans-serif; font-size: 12px;
         }
         #status-note {
-            margin-top: 8px;
-            padding: 5px;
-            display: block;
-            text-align: center;
-            font-weight: bold;
-            border-radius: 3px;
+            margin-top: 5px; padding: 5px;
+            display: block; text-align: center; font-weight: bold;
         }
     </style>
 </head>
@@ -73,32 +74,26 @@
 <body style="margin: 0; overflow: hidden;">
 
     <div id="version-info">
-        VER: 2026.02.07-v5 (Countdown)<br>
+        VER: 2026.02.07-v6 (Pin System)<br>
         <span id="status-note" style="background: #27ae60;">DURUM: HAZIR</span>
     </div>
 
     <a-scene 
         embedded 
-        arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
+        arjs="sourceType: webcam; debugUIEnabled: false;"
         vr-mode-ui="enabled: false">
         
         <a-marker type="pattern" url="qr/pattern-ar_projesi.patt" marker-kontrol>
-            <a-box 
-                id="ar-kup"
-                position="0 0.5 0" 
-                visible="false"
-                material="color: #FF5733; transparent: true; opacity: 0.9;">
-            </a-box>
-            <a-text 
-                id="ar-metin"
-                value="Sanal Kup" 
-                position="0 1.2 0" 
-                align="center"
-                visible="false"
-                color="white" 
-                width="4">
-            </a-text>
-        </a-marker>
+            </a-marker>
+
+        <a-box 
+            id="ar-kup"
+            position="0 0 -5" 
+            visible="false"
+            scale="1 1 1"
+            material="color: #FF5733; opacity: 0.9;">
+            <a-text value="Sanal Kup" align="center" position="0 0.8 0" width="3"></a-text>
+        </a-box>
 
         <a-entity camera></a-entity>
     </a-scene>
