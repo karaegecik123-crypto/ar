@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <title>AR QR Projesi</title>
+    <title>AR QR Projesi - Sabit Obje</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     
     <style>
-        /* Sağ Üst Versiyon Butonu Tasarımı */
         #version-info {
             position: absolute;
             top: 10px;
@@ -21,7 +20,7 @@
             border-radius: 4px;
             font-family: monospace;
             font-size: 12px;
-            pointer-events: none; /* Tıklanmasa da olur, sadece bilgi amaçlı */
+            pointer-events: none;
         }
     </style>
 </head>
@@ -29,23 +28,37 @@
 <body style="margin: 0; overflow: hidden;">
 
     <div id="version-info">
-        VER: 2026.02.01-v1<br>
-        STATUS: ACTIVE
+        VER: 2026.02.07-v2<br>
+        STATUS: STATIC_OBJECT
     </div>
 
     <a-scene 
         embedded 
-        arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
+        arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3; trackingMethod: best;"
         vr-mode-ui="enabled: false">
         
-        <a-marker type="pattern" url="qr/pattern-ar_projesi.patt">
+        <a-marker 
+            type="pattern" 
+            url="qr/pattern-ar_projesi.patt"
+            smooth="true"
+            smoothCount="10"
+            smoothTolerance="0.01"
+            smoothThreshold="5">
+
             <a-box 
                 position="0 0.5 0" 
-                material="color: #FF5733; transparent: true; opacity: 0.8;"
-                animation="property: rotation; to: 0 360 0; loop: true; dur: 3000">
+                scale="1 1 1"
+                material="color: #FF5733; transparent: true; opacity: 0.9; side: double;">
             </a-box>
             
-            <a-text value="Sanal Kup" position="-0.5 1.2 0" color="black" width="3"></a-text>
+            <a-text 
+                value="Sanal Kup" 
+                position="0 1.2 0" 
+                align="center"
+                color="white" 
+                width="4">
+            </a-text>
+
         </a-marker>
 
         <a-entity camera></a-entity>
